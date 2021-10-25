@@ -164,6 +164,7 @@ public class JsonDataGenerator {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
                 //wakie wakie!
+                log.info("Interrupted while sleeping");
             }
         }
 
