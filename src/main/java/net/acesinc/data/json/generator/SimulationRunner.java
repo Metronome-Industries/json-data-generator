@@ -38,7 +38,6 @@ public class SimulationRunner {
     }
 
     private void setupSimulation() {
-        running = false;
         for (WorkflowConfig workflowConfig : config.getWorkflows()) {
             try {
                 Workflow w = JSONConfigReader.readConfig(this.getClass().getClassLoader().getResourceAsStream(workflowConfig.getWorkflowFilename()), Workflow.class);
