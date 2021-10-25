@@ -8,6 +8,7 @@ package net.acesinc.data.json.generator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import net.acesinc.data.json.generator.config.SimulationConfig;
 import net.acesinc.data.json.generator.config.WorkflowConfig;
@@ -55,11 +56,8 @@ public class SimulationRunner {
     public void startSimulation() {
         log.info("Starting Simulation");
 
-        if (eventGenThreads.size() > 0) {
-            for (Thread t : eventGenThreads) {
-                t.start();
-            }
-        }
+        // hmmm, maybe this isn't a good idea
+        eventGenThreads.parallelStream().forEach(Thread::start);
     }
 
     public void stopSimulation() {
