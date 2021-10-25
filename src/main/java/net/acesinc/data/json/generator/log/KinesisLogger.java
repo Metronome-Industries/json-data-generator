@@ -82,7 +82,7 @@ public class KinesisLogger implements EventLogger {
     }
 
     @Override
-    public void logEvent(String event, Map<String, Object> producerConfig) {
+    public Map<String, Object> logEvent(String event, Map<String, Object> producerConfig) {
 
         String streamName = (String) producerConfig.get("stream");
         if(streamName == null){
@@ -107,6 +107,8 @@ public class KinesisLogger implements EventLogger {
             shutdown();
             System.exit(0);
         }
+
+        return null;
     }
 
     @Override

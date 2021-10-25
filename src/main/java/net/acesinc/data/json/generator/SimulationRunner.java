@@ -8,6 +8,7 @@ package net.acesinc.data.json.generator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 import net.acesinc.data.json.generator.config.SimulationConfig;
 import net.acesinc.data.json.generator.config.WorkflowConfig;
 import net.acesinc.data.json.generator.config.JSONConfigReader;

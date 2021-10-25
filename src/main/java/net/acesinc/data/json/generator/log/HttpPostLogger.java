@@ -56,11 +56,11 @@ public class HttpPostLogger implements EventLogger {
     }
 
     @Override
-    public void logEvent(String event, Map<String, Object> producerConfig) {
-        logEvent(event);
+    public Map<String, Object> logEvent(String event, Map<String, Object> producerConfig) {
+        return logEvent(event);
     }
     
-    private void logEvent(String event) {
+    private Map<String, Object> logEvent(String event) {
         try {
             HttpPost request = new HttpPost(url);
             StringEntity input = new StringEntity(event);
@@ -71,21 +71,18 @@ public class HttpPostLogger implements EventLogger {
                 request.addHeader(header.getKey(), header.getValue());
             }
 
-//            log.debug("executing request " + request);
             CloseableHttpResponse response = null;
             try {
+                final long start = System.currentTimeMillis();
                 response = httpClient.execute(request);
+                log.info("Request time (ms): " + (System.currentTimeMillis() - start));
+                log.info("Response status code: " + response.getStatusLine().getStatusCode());
             } catch (IOException ex) {
                 log.error("Error POSTing Event", ex);
             }
             if (response != null) {
                 try {
-//                    log.debug("----------------------------------------");
-//                    log.debug(response.getStatusLine().toString());
                     HttpEntity resEntity = response.getEntity();
-                    if (resEntity != null) {
-//                        log.debug("Response content length: " + resEntity.getContentLength());
-                    }
                     EntityUtils.consume(resEntity);
                 } catch (IOException ioe) {
                     //oh well
@@ -99,6 +96,8 @@ public class HttpPostLogger implements EventLogger {
         } catch (Exception e) {
 
         }
+
+        return null;
     }
 
     @Override

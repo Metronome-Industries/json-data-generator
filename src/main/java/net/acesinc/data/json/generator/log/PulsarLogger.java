@@ -76,7 +76,7 @@ public class PulsarLogger implements EventLogger {
     }
     
     @Override
-    public void logEvent(String event, Map<String, Object> producerConfig) {
+    public Map<String, Object> logEvent(String event, Map<String, Object> producerConfig) {
         
         String output = event;
         
@@ -85,7 +85,7 @@ public class PulsarLogger implements EventLogger {
                 output = jsonUtils.flattenJson(event);
             } catch (IOException ex) {
                 log.error("Error flattening json. Unable to send event [ " + event + " ]", ex);
-                return;
+                return null;
             }
         }
         
@@ -99,6 +99,7 @@ public class PulsarLogger implements EventLogger {
             producer.sendAsync(output.getBytes());
         }
 
+        return null;
     }
 
     @Override

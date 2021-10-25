@@ -23,8 +23,10 @@ public class Log4JLogger implements EventLogger {
     private ObjectMapper mapper = new ObjectMapper();
 
     @Override
-    public void logEvent(String event, Map<String, Object> producerConfig) {
+    public Map<String, Object> logEvent(String event, Map<String, Object> producerConfig) {
         logEvent(event);
+
+        return null;
     }
     
     private void logEvent(String event) {

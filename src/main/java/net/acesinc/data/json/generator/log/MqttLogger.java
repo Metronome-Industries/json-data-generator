@@ -68,7 +68,7 @@ public class MqttLogger implements EventLogger {
     }
 
     @Override
-    public void logEvent(String event, Map<String, Object> producerConfig) {
+    public Map<String, Object> logEvent(String event, Map<String, Object> producerConfig) {
         String _topic = null;
         Integer _qos = null;
         Object value = producerConfig.get(PRODUCER_TYPE_NAME);
@@ -78,6 +78,8 @@ public class MqttLogger implements EventLogger {
             _qos = (Integer) config.get(QOS_PROP_NAME);
         }
         logEvent(event, null == _topic ? topic : _topic, null == _qos ? qos : _qos);
+
+        return null;
     }
     
     /**

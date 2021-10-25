@@ -13,6 +13,6 @@ import java.util.Map;
  * @author andrewserff
  */
 public interface EventLogger {
-    public void logEvent(String event, Map<String, Object> producerConfig);
-    public void shutdown();
+    Map<String, Object> logEvent(String event, Map<String, Object> producerConfig);
+    void shutdown();
 }

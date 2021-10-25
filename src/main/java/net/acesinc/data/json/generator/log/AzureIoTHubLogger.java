@@ -45,9 +45,11 @@ public final class AzureIoTHubLogger implements EventLogger {
 	 * @see net.acesinc.data.json.generator.log.EventLogger#logEvent(java.lang.String, java.util.Map)
 	 */
 	@Override
-	public void logEvent(String event, Map<String, Object> producerConfig) {
+	public Map<String, Object> logEvent(String event, Map<String, Object> producerConfig) {
 		
 		this.deviceClient.sendEventAsync(new Message(event), null, null);
+
+		return null;
 	}
 
 	/* (non-Javadoc)
