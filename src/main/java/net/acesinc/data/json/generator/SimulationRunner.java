@@ -5,9 +5,14 @@
  */
 package net.acesinc.data.json.generator;
 
+import com.codahale.metrics.ConsoleReporter;
+import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.Timer;
+import com.codahale.metrics.Timer.Context;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import net.acesinc.data.json.generator.config.SimulationConfig;
 import net.acesinc.data.json.generator.config.WorkflowConfig;
 import net.acesinc.data.json.generator.config.JSONConfigReader;
@@ -23,10 +28,21 @@ import org.apache.logging.log4j.Logger;
 public class SimulationRunner {
 
     private static final Logger log = LogManager.getLogger(SimulationRunner.class);
+
+    public static final MetricRegistry metrics = new MetricRegistry();
+    private static final ConsoleReporter reporter = ConsoleReporter.forRegistry(metrics)
+        .convertDurationsTo(TimeUnit.MILLISECONDS)
+        .convertRatesTo(TimeUnit.SECONDS)
+        .build();
+
+
     private SimulationConfig config;
     private List<EventGenerator> eventGenerators;
     private List<Thread> eventGenThreads;
     private List<EventLogger> eventLoggers;
+    private final Timer simDurationTimer = metrics.timer(MetricRegistry.name(SimulationRunner.class, "duration", "ms"));
+
+    private Context durationContext;
 
     public SimulationRunner(SimulationConfig config, List<EventLogger> loggers) {
         this.config = config;
@@ -53,15 +69,19 @@ public class SimulationRunner {
 
     public void startSimulation() {
         log.info("Starting Simulation");
+        durationContext = this.simDurationTimer.time();
 
-        if (eventGenThreads.size() > 0) {
-            for (Thread t : eventGenThreads) {
-                t.start();
-            }
-        }
+        eventGenThreads.parallelStream().forEach(Thread::start);
     }
 
     public void stopSimulation() {
+        if (durationContext != null) {
+            durationContext.stop();
+        }
+
+        log.info("Reporting  metrics if there are any");
+        reporter.report();
+
         log.info("Stopping Simulation");
         for (Thread t : eventGenThreads) {
             t.interrupt();
@@ -72,13 +92,7 @@ public class SimulationRunner {
     }
 
     public boolean isRunning() {
-        for (Thread t : eventGenThreads) {
-            if (t.isAlive()) {
-                return true;
-            }
-        }
-
-        return false;
+        return eventGenThreads.parallelStream().anyMatch(Thread::isAlive);
     }
 
 }

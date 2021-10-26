@@ -5,7 +5,9 @@
  */
 package net.acesinc.data.json.generator;
 
+import com.codahale.metrics.MetricRegistry;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -37,6 +39,7 @@ public class EventGenerator implements Runnable {
     private List<EventLogger> eventLoggers;
     private long startTime;
     private long generatedEvents = 0;
+    private RandomJsonGenerator generator;
     private WorkflowConfig workflowConfig;
 
     public EventGenerator(Workflow workflow, WorkflowConfig workflowConfig, List<EventLogger> loggers) {
@@ -44,6 +47,7 @@ public class EventGenerator implements Runnable {
         this.workflowConfig = workflowConfig;
         this.generatorName = workflowConfig.getWorkflowName();
         this.eventLoggers = loggers;
+        this.generator = new RandomJsonGenerator(workflowConfig);
     }
 
     public void runWorkflow() {
@@ -258,8 +262,14 @@ public class EventGenerator implements Runnable {
     }
 
     public String generateEvent(Map<String, Object> config) throws IOException {
-        RandomJsonGenerator generator = new RandomJsonGenerator(config, workflowConfig);
-        return generator.generateJson();
+        final long start = System.currentTimeMillis();
+        String json = generator.generateJson(config);
+
+        SimulationRunner.metrics.timer(
+            MetricRegistry.name(EventGenerator.class, "event", "generation", "duration", "ms"))
+            .update(Duration.ofMillis(System.currentTimeMillis() - start));
+
+        return json;
     }
 
     private int generateRandomNumber(int min, int max) {
