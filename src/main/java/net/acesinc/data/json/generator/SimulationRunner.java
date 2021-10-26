@@ -56,7 +56,6 @@ public class SimulationRunner {
     public void startSimulation() {
         log.info("Starting Simulation");
 
-        // hmmm, maybe this isn't a good idea
         eventGenThreads.parallelStream().forEach(Thread::start);
     }
 
