@@ -193,6 +193,7 @@ public class EventGenerator implements Runnable {
     }
 
     private void executeAllConfigs(WorkflowStep step) {
+        log.warn("executeAllConfigs");
         for (Map<String, Object> config : step.getConfig()) {
             Map<String, Object> wrapper = new LinkedHashMap<>();
             wrapper.put(null, config);
@@ -216,6 +217,7 @@ public class EventGenerator implements Runnable {
     }
 
     private void executeRandomConfig(WorkflowStep step) {
+        log.warn("executeRandomConfig");
         final List<Map<String, Object>> reports = new ArrayList<>();
         List<Map<String, Object>> configs = step.getConfig();
         try {
@@ -225,7 +227,10 @@ public class EventGenerator implements Runnable {
             for (EventLogger l : eventLoggers) {
                 final Map<String, Object> report = l.logEvent(event, step.getProducerConfig());
                 if (report != null) {
+                    log.warn("Got a non-null report.");
                     reports.add(report);
+                } else {
+                    log.warn("Got a null report.");
                 }
             }
             try {
