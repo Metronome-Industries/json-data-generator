@@ -239,6 +239,8 @@ public class EventGenerator implements Runnable {
             log.error("Error generating json event", ioe);
         }
 
+        log.warn("Reports returned: " + reports.size());
+
         final Map<String, Object> overallReport = new HashMap<>();
         for (final Map<String, Object> report : reports) {
             for (final Entry<String, Object> reportEntry : report.entrySet()) {
@@ -253,7 +255,7 @@ public class EventGenerator implements Runnable {
             }
         }
 
-        log.info(overallReport);
+        log.warn(overallReport);
     }
 
 
