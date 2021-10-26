@@ -194,14 +194,21 @@ public class EventGenerator implements Runnable {
 
     private void executeAllConfigs(WorkflowStep step) {
         log.warn("executeAllConfigs");
+        final List<Map<String, Object>> reports = new ArrayList<>();
         for (Map<String, Object> config : step.getConfig()) {
             Map<String, Object> wrapper = new LinkedHashMap<>();
             wrapper.put(null, config);
             try {
                 String event = generateEvent(wrapper);
                 for (EventLogger l : eventLoggers) {
-                    l.logEvent(event,
+                    final Map<String, Object> report = l.logEvent(event,
                         step.getProducerConfig());
+                    if (report != null) {
+                        log.warn("Got a non-null report.");
+                        reports.add(report);
+                    } else {
+                        log.warn("Got a null report.");
+                    }
                 }
                 try {
                     performEventSleep(workflow);
@@ -214,6 +221,24 @@ public class EventGenerator implements Runnable {
                 log.error("Error generating json event", ioe);
             }
         }
+
+        log.warn("Reports returned: " + reports.size());
+
+        final Map<String, Object> overallReport = new HashMap<>();
+        for (final Map<String, Object> report : reports) {
+            for (final Entry<String, Object> reportEntry : report.entrySet()) {
+                if ("status".equals(reportEntry.getKey())) {
+                    overallReport.merge(reportEntry.getValue().toString(), 1,
+                        (o, o2) -> ((Integer) o) + 1);
+                } else if ("duration".equals(reportEntry.getKey())) {
+                    overallReport.compute("longest", (k, v) -> (v == null ? 0 : (Long) v) > ((Long) reportEntry.getValue()) ? v : reportEntry.getValue());
+                } else {
+                    log.warn("Got an unexpected key: " + reportEntry.getKey());
+                }
+            }
+        }
+
+        log.warn(overallReport);
     }
 
     private void executeRandomConfig(WorkflowStep step) {
