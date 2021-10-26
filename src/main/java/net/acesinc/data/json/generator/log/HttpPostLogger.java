@@ -61,6 +61,7 @@ public class HttpPostLogger implements EventLogger {
     }
     
     private Map<String, Object> logEvent(String event) {
+        final Map<String, Object> report = new HashMap<>();
         try {
             HttpPost request = new HttpPost(url);
             StringEntity input = new StringEntity(event);
@@ -75,8 +76,11 @@ public class HttpPostLogger implements EventLogger {
             try {
                 final long start = System.currentTimeMillis();
                 response = httpClient.execute(request);
-                log.info("Request time (ms): " + (System.currentTimeMillis() - start));
-                log.info("Response status code: " + response.getStatusLine().getStatusCode());
+                final long duration = System.currentTimeMillis() - start;
+                final String status = String.valueOf(response.getStatusLine().getStatusCode());
+
+                report.put("status", status);
+                report.put("duration", duration);
             } catch (IOException ex) {
                 log.error("Error POSTing Event", ex);
             }
@@ -97,7 +101,7 @@ public class HttpPostLogger implements EventLogger {
 
         }
 
-        return null;
+        return report;
     }
 
     @Override

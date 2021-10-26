@@ -14,8 +14,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 
+import java.util.function.BiFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -198,7 +200,8 @@ public class EventGenerator implements Runnable {
             try {
                 String event = generateEvent(wrapper);
                 for (EventLogger l : eventLoggers) {
-                    l.logEvent(event, step.getProducerConfig());
+                    l.logEvent(event,
+                        step.getProducerConfig());
                 }
                 try {
                     performEventSleep(workflow);
@@ -214,13 +217,17 @@ public class EventGenerator implements Runnable {
     }
 
     private void executeRandomConfig(WorkflowStep step) {
+        final List<Map<String, Object>> reports = new ArrayList<>();
         List<Map<String, Object>> configs = step.getConfig();
         try {
             Map<String, Object> wrapper = new LinkedHashMap<>();
             wrapper.put(null, configs.get(generateRandomNumber(0, configs.size() - 1)));
             String event = generateEvent(wrapper);
             for (EventLogger l : eventLoggers) {
-                l.logEvent(event, step.getProducerConfig());
+                final Map<String, Object> report = l.logEvent(event, step.getProducerConfig());
+                if (report != null) {
+                    reports.add(report);
+                }
             }
             try {
                 performEventSleep(workflow);
@@ -231,6 +238,22 @@ public class EventGenerator implements Runnable {
         } catch (IOException ioe) {
             log.error("Error generating json event", ioe);
         }
+
+        final Map<String, Object> overallReport = new HashMap<>();
+        for (final Map<String, Object> report : reports) {
+            for (final Entry<String, Object> reportEntry : report.entrySet()) {
+                if ("status".equals(reportEntry.getKey())) {
+                    overallReport.merge(reportEntry.getValue().toString(), 1,
+                        (o, o2) -> ((Integer) o) + 1);
+                } else if ("duration".equals(reportEntry.getKey())) {
+                    overallReport.compute("longest", (k, v) -> (v == null ? 0 : (Long) v) > ((Long) reportEntry.getValue()) ? v : reportEntry.getValue());
+                } else {
+                    log.warn("Got an unexpected key: " + reportEntry.getKey());
+                }
+            }
+        }
+
+        log.info(overallReport);
     }
 
 
