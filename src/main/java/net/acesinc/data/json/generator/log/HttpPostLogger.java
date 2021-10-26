@@ -79,6 +79,8 @@ public class HttpPostLogger implements EventLogger {
                 final long duration = System.currentTimeMillis() - start;
                 final String status = String.valueOf(response.getStatusLine().getStatusCode());
 
+                log.info("request status: " + status);
+                log.info("request duration: " + duration);
                 report.put("status", status);
                 report.put("duration", duration);
             } catch (IOException ex) {
