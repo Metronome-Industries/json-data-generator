@@ -163,28 +163,6 @@
           <version>4.1.2</version>
         </dependency>
     </dependencies>
-    <repositories>
-        <!-- These are set in the settings.xml to our nexus repo -->
-        <repository>
-            <id>Eclipse Paho Repo</id>
-            <url>https://repo.eclipse.org/content/repositories/paho-releases</url>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <!-- These are set in the settings.xml to our nexus repo -->
-    </pluginRepositories>
-    <distributionManagement>
-        <snapshotRepository>
-            <id>sonatype-nexus-snapshots</id>
-            <name>Sonatype Nexus snapshot repository</name>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>sonatype-nexus-staging</id>
-            <name>Sonatype Nexus release repository</name>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
     <build>
         <plugins>
             <plugin>
