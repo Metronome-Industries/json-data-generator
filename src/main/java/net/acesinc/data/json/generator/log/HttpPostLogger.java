@@ -53,7 +53,7 @@ public class HttpPostLogger implements EventLogger {
 
         final Object headerConfigs = props.get(HEADERS_PROP_NAME);
         if (headerConfigs instanceof Map) {
-            for (Entry<Object, Object> header : ((Map<Object, Object>) headerConfigs).entrySet()) {
+            for (Entry<?, ?> header : ((Map<?, ?>) headerConfigs).entrySet()) {
                 if (header.getKey() instanceof String && header.getValue() instanceof String) {
                     headers.put((String) header.getKey(), (String) header.getValue());
                 }
