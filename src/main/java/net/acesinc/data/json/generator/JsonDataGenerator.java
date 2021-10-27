@@ -150,7 +150,7 @@ public class JsonDataGenerator {
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException ex) {
-                //wakie wakie!
+                log.info("Interrupted while sleeping. Breaking out of the loop and shutting down.");
                 break;
             }
         }
